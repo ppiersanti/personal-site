@@ -6,8 +6,7 @@
 == About Me
 
 I am a software developer and I'm employed in a internet provider.
-My main technologies are *Clojure*, *Clojurescript*,
-functional programming is giving me a new perspective about
-building software.
+My main technologies are *Clojure*, *Clojurescript*, and Java.
+
 
 Email: paolo at micso.it
