@@ -20,4 +20,4 @@ Add the following line:
 @xset m <acceleration> <threshold>
 ```
 
-where acceleration and threshold are your defined values.
+where `acceleration` and `threshold` are your defined values, expressed in decimal notation as `1.2`.
