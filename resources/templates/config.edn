@@ -1,6 +1,6 @@
 {:site-title           "gon's Blog"
  :author               "Paolo Piersanti"
- :description          "Blog about what I'm found of"
+ :description          "Notes, thoughts about software & more..."
  :site-url             "http://paolopiersanti.it"
  :post-root            "posts"
  :page-root            "pages"
