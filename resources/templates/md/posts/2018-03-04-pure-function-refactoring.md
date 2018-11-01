@@ -128,14 +128,14 @@ Let's do it:
 (defn reset
   "Reset order state for the next billing."
   [order]
-  (let [{items false zsp-items true} (group-by #(= "ZSP" (get % :item_id)) order)                 ;; split resettable lines
-        items                        (map reset-line items)                                       ;; do business logic
-        min-shipping-date            (apply t/min-date (map :shipping-date items))                ;; post retrieve the min shipping date
-        zsp-items                    (map #(assoc %1 :shipping_date min-shipping-date) zsp-items) ;; update zsp items
-        items                        (reduce conj items zsp-items)]                               ;; join order lines again
+  (let [{lines false zsp-lines true} (group-by #(= "ZSP" (get % :item_id)) order)                 ; split resettable lines
+        lines                        (map reset-line lines)                                       ; do business logic
+        min-shipping-date            (apply t/min-date (map :shipping-date lines))                ; post retrieve the min shipping date
+        zsp-lines                    (map #(assoc %1 :shipping_date min-shipping-date) zsp-lines) ; update zsp lines
+        lines                        (reduce conj lines zsp-lines)]                               ; join order lines again
 
 	 ;; returns a vector with min-shipping-date and updated order detail
-     [min-shipping-date detail]))
+     [min-shipping-date lines]))
 ```
 
 
