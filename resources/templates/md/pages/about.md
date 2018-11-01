@@ -5,7 +5,7 @@
 
 ## About Me
 
-I am a software developer and I'm employed in a internet provider.
+I am a software developer employed in a internet provider.
 My main technologies are *Clojure*, *Clojurescript*, and Java.
 
 
