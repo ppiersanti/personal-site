@@ -142,6 +142,8 @@ Let's do it:
 The refactoring consisted in moving out in a new function
 the database and log stuff, passing it the data to persist.
 
+The reset's function output can be provided to the save function for persistence.
+
 The original function is now decoupled from db dependency,
 can be growed interactively at the REPL, tests can be written
 without worrying about having a db or any else impediment in the developing stage.
