@@ -1,7 +1,7 @@
 {:title "Pure function refactoring"
  :layout :post
  :tags  ["Clojure" "Refactoring" "Pure Function"]
- :toc true
+ :toc false
  :draft? false}
 
 ## A pratical example
@@ -48,45 +48,45 @@ Here is the code[^1]:
 
   (let [min-shipping-date
    (loop [xs order min-date (t/date-time 2039 1 1)]
-    (if-let [line (first (seq xs))]
-     (if (not= "ZSP" (:item-id line)) ; bypass zsp items
-      (let [line (reset-line line)]
+	(if-let [line (first (seq xs))]
+	 (if (not= "ZSP" (:item-id line)) ; bypass zsp items
+	  (let [line (reset-line line)]
 
-       ;; side-effects here !!!
-       (log/info "Processing order line" (str  (:order_id line) "/" (:order_line_id line)))
+	   ;; side-effects here !!!
+	   (log/info "Processing order line" (str  (:order_id line) "/" (:order_line_id line)))
 
-       ;; side-effects here too !!!
-       (j/update! db :ORDER_LINE line ["order_id=? AND order_line_id=?" (:order_id line) (:order_line_id line)])
+	   ;; side-effects here too !!!
+	   (j/update! db :ORDER_LINE line ["order_id=? AND order_line_id=?" (:order_id line) (:order_line_id line)])
 
 	   ;; do other things here, omitted for clarity
 	   ;; ...
 
-       (recur (rest xs) (if (t/minus (:shipping_date line) min-date) (:shipping_date line) min-date)))
+	   (recur (rest xs) (if (t/minus (:shipping_date line) min-date) (:shipping_date line) min-date)))
 	 (recur (rest xs) min-date))
 	min-date))])
 
-    ;; perform post operations after order detail reset
+	;; perform post operations after order detail reset
 
-    ;; side effects here !!!
-    (j/update! db :ORDER {:shipping-date min-shipping-date} ["order_id=?" (:order_id line)])
+	;; side effects here !!!
+	(j/update! db :ORDER {:shipping-date min-shipping-date} ["order_id=?" (:order_id line)])
 
-    ;; loop again through the order lines to update zsp items
+	;; loop again through the order lines to update zsp items
 	(loop [xs order]
 	  (when-let [line (first (seq xs))]
-	    (when (= "ZSP" (:item-id line))
+		(when (= "ZSP" (:item-id line))
 		  (j/update! db :ORDER_LINE {:shipping-date min-shipping-date} ["order_id=? AND order_line_id=?" (:order_id line) (:order_line_id line)]))
-	      (recur (rest xs))))
+		  (recur (rest xs))))
 
-    (let [msg (str "Resetting order shipping date to "
-              (fmt-date min-shipping-date)
-              " [" (mut/order-number order) "]")]
+	(let [msg (str "Resetting order shipping date to "
+			  (fmt-date min-shipping-date)
+			  " [" (mut/order-number order) "]")]
 
-        ;; again side effects here !!!
+		;; again side effects here !!!
 		(.log elog (:customer_id order) :info msg)
-          (log/info msg))
+		  (log/info msg))
 
-     ;; do other things here, omitted for clarity
-     ;; ...
+	 ;; do other things here, omitted for clarity
+	 ;; ...
 
 ```
 
@@ -120,7 +120,7 @@ Let's do it:
 (defn save
   [db elog min-shipping-date order]
   (doseq [line order]
-    ;; call the db update fn
+	;; call the db update fn
 	;; call log
 	;; and so on
 ))
@@ -129,13 +129,13 @@ Let's do it:
   "Reset order state for the next billing."
   [order]
   (let [{lines false zsp-lines true} (group-by #(= "ZSP" (get % :item_id)) order)                 ; split resettable lines
-        lines                        (map reset-line lines)                                       ; do business logic
-        min-shipping-date            (apply t/min-date (map :shipping-date lines))                ; post retrieve the min shipping date
-        zsp-lines                    (map #(assoc %1 :shipping_date min-shipping-date) zsp-lines) ; update zsp lines
-        lines                        (reduce conj lines zsp-lines)]                               ; join order lines again
+		lines                        (map reset-line lines)                                       ; do business logic
+		min-shipping-date            (apply t/min-date (map :shipping-date lines))                ; post retrieve the min shipping date
+		zsp-lines                    (map #(assoc %1 :shipping_date min-shipping-date) zsp-lines) ; update zsp lines
+		lines                        (reduce conj lines zsp-lines)]                               ; join order lines again
 
 	 ;; returns a vector with min-shipping-date and updated order detail
-     [min-shipping-date lines]))
+	 [min-shipping-date lines]))
 ```
 
 
